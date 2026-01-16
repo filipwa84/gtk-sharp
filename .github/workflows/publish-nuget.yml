@@ -1,0 +1,82 @@
+name: Build and Publish NuGet Packages
+
+on:
+  push:
+    branches: [ net9-packages, main, master ]
+  pull_request:
+    branches: [ net9-packages, main, master ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install GTK+ 2.x development libraries
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk2.0-dev libpango1.0-dev libglade2-dev libcairo2-dev
+
+    - name: Create symlinks for custom files
+      run: |
+        for dir in pango atk gdk gtk glade; do
+          if [ -d "$dir/generated" ]; then
+            for custom in "$dir"/*.custom; do
+              if [ -f "$custom" ]; then
+                ln -sf "../$(basename $custom)" "$dir/generated/$(basename $custom)" 2>/dev/null || true
+              fi
+            done
+          fi
+        done
+
+    - name: Restore dependencies
+      run: dotnet restore gtk-sharp.net9.sln
+
+    - name: Build
+      run: dotnet build gtk-sharp.net9.sln --configuration Release --no-restore
+
+    - name: Pack NuGet packages
+      run: dotnet pack gtk-sharp.net9.sln --configuration Release --no-build --output ./nupkgs
+
+    - name: Upload NuGet packages as artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./nupkgs/*.nupkg
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/net9-packages' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+    - name: Download NuGet packages
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./nupkgs
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Publish to GitHub Packages
+      run: |
+        dotnet nuget add source --username filipwa84 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/filipwa84/index.json"
+        for package in ./nupkgs/*.nupkg; do
+          dotnet nuget push "$package" --source "github" --skip-duplicate
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

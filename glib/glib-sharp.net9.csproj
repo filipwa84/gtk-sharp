@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>glib-sharp</AssemblyName>
+    <RootNamespace>GLib</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>GTK_SHARP_2_6;GTK_SHARP_2_8;GTK_SHARP_2_10;GTK_SHARP_2_12</DefineConstants>
+    <NoWarn>0618;0649;0169;0414;0612;1616;1699;1504</NoWarn>
+
+    <!-- NuGet Package Properties -->
+    <PackageId>GtkSharp.Glib</PackageId>
+    <Version>2.12.50</Version>
+    <Authors>filipwa84</Authors>
+    <Company>filipwa84</Company>
+    <Description>GLib# - .NET bindings for the GLib object system library. Part of GTK# for .NET 9.</Description>
+    <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/filipwa84/gtk-sharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/filipwa84/gtk-sharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>gtk;glib;dotnet;linux;desktop;gui</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="**/*.cs" Exclude="obj/**;bin/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="glib-sharp.dll.config" Pack="true" PackagePath="build/net9.0" />
+  </ItemGroup>
+
+</Project>
