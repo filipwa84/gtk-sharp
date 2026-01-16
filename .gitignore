@@ -35,7 +35,8 @@ config.*
 configure
 configure.in
 depcomp
-generated
+# generated is now tracked for .NET 9 builds
+# generated
 generated.c
 generated-stamp
 gtk-sharp.snk
