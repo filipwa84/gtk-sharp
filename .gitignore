@@ -52,3 +52,12 @@ msi/unmanaged/source/*
 policy.config
 policy.*.config
 stamp*
+
+# Include native libraries in runtimes
+!*/runtimes/**/*.dll
+!*/runtimes/**/*.so
+
+# Exclude build artifacts
+mingw-gtk2/
+test-packages/
+

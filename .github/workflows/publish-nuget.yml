@@ -23,10 +23,153 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Install GTK+ 2.x development libraries
+    - name: Install build dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y libgtk2.0-dev libpango1.0-dev libglade2-dev libcairo2-dev
+        sudo apt-get install -y mingw-w64 mingw-w64-tools
+
+    - name: Build Linux native glue libraries
+      run: |
+        ./configure
+        make -C glib/glue
+        make -C gdk/glue
+        make -C gtk/glue
+        make -C pango/glue
+        make -C atk/glue
+        make -C glade/glue
+
+    - name: Create runtimes directories
+      run: |
+        mkdir -p glib/runtimes/{win-x64,linux-x64}/native
+        mkdir -p gdk/runtimes/{win-x64,linux-x64}/native
+        mkdir -p gtk/runtimes/{win-x64,linux-x64}/native
+        mkdir -p pango/runtimes/{win-x64,linux-x64}/native
+        mkdir -p atk/runtimes/{win-x64,linux-x64}/native
+        mkdir -p cairo/runtimes/{win-x64,linux-x64}/native
+        mkdir -p glade/runtimes/{win-x64,linux-x64}/native
+
+    - name: Copy Linux native libraries
+      run: |
+        cp glib/glue/.libs/libglibsharpglue-2.so glib/runtimes/linux-x64/native/
+        cp gdk/glue/.libs/libgdksharpglue-2.so gdk/runtimes/linux-x64/native/
+        cp gtk/glue/.libs/libgtksharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp pango/glue/.libs/libpangosharpglue-2.so pango/runtimes/linux-x64/native/
+        cp atk/glue/.libs/libatksharpglue-2.so atk/runtimes/linux-x64/native/
+        cp glade/glue/.libs/libgladesharpglue-2.so glade/runtimes/linux-x64/native/
+
+    - name: Download Windows GTK+ libraries
+      run: |
+        mkdir -p mingw-gtk2/packages
+        cd mingw-gtk2
+        BASE_URL="https://repo.msys2.org/mingw/mingw64"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-gtk2-2.24.33-8-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-glib2-2.84.3-2-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-pango-1.56.4-3-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-cairo-1.18.4-4-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-atk-2.58.3-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-gdk-pixbuf2-2.44.4-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-fontconfig-2.15.0-2-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-freetype-2.13.3-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-gettext-runtime-0.23.1-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-harfbuzz-12.3.0-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-fribidi-1.0.16-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-libpng-1.6.45-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-pixman-0.44.2-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-zlib-1.3.1-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-libiconv-1.18-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-pcre2-10.45-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-libffi-3.4.8-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-expat-2.6.4-1-any.pkg.tar.zst"
+        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst"
+
+    - name: Extract Windows GTK+ libraries
+      run: |
+        mkdir -p mingw-gtk2/mingw64
+        cd mingw-gtk2
+        for pkg in packages/*.pkg.tar.zst; do
+          tar -I zstd -xf "$pkg" -C mingw64 2>/dev/null || true
+        done
+
+    - name: Cross-compile Windows glue DLLs
+      run: |
+        MINGW_PREFIX="${PWD}/mingw-gtk2/mingw64/mingw64"
+        CC=x86_64-w64-mingw32-gcc
+        CFLAGS="-O2 -Wall -shared -DGTK_SHARP_2_6 -DGTK_SHARP_2_8 -DGTK_SHARP_2_10 -DGTK_SHARP_2_12 -DDISABLE_GTHREAD_CHECK -Wno-deprecated-declarations"
+        INCLUDES="-I$MINGW_PREFIX/include/glib-2.0 -I$MINGW_PREFIX/lib/glib-2.0/include -I$MINGW_PREFIX/include/gtk-2.0 -I$MINGW_PREFIX/lib/gtk-2.0/include -I$MINGW_PREFIX/include/gdk-pixbuf-2.0 -I$MINGW_PREFIX/include/pango-1.0 -I$MINGW_PREFIX/include/atk-1.0 -I$MINGW_PREFIX/include/cairo -I$MINGW_PREFIX/include/harfbuzz -I$MINGW_PREFIX/include/freetype2 -I."
+        LDFLAGS="-L$MINGW_PREFIX/lib"
+
+        # Build glibsharpglue-2.dll
+        $CC $CFLAGS $INCLUDES $LDFLAGS -o glib/runtimes/win-x64/native/glibsharpglue-2.dll \
+          glib/glue/closure.c glib/glue/error.c glib/glue/object.c glib/glue/ptrarray.c \
+          glib/glue/signal.c glib/glue/type.c glib/glue/unichar.c glib/glue/value.c \
+          glib/glue/valuearray.c glib/glue/thread.c glib/glue/win32dll.c \
+          -lglib-2.0 -lgobject-2.0 -lintl
+
+        # Build gdksharpglue-2.dll
+        $CC $CFLAGS $INCLUDES $LDFLAGS -o gdk/runtimes/win-x64/native/gdksharpglue-2.dll \
+          gdk/glue/device.c gdk/glue/dragcontext.c gdk/glue/event.c gdk/glue/generated.c \
+          gdk/glue/selection.c gdk/glue/windowmanager.c gdk/glue/win32dll.c \
+          -lgdk-win32-2.0 -lgdk_pixbuf-2.0 -lglib-2.0 -lgobject-2.0 -lintl
+
+        # Build gtksharpglue-2.dll
+        $CC $CFLAGS $INCLUDES $LDFLAGS -o gtk/runtimes/win-x64/native/gtksharpglue-2.dll \
+          gtk/glue/adjustment.c gtk/glue/cellrenderer.c gtk/glue/clipboard.c gtk/glue/colorseldialog.c \
+          gtk/glue/container.c gtk/glue/generated.c gtk/glue/nodestore.c gtk/glue/object.c \
+          gtk/glue/selectiondata.c gtk/glue/statusicon.c gtk/glue/style.c gtk/glue/targetlist.c \
+          gtk/glue/widget.c gtk/glue/win32dll.c \
+          -lgtk-win32-2.0 -lgdk-win32-2.0 -lgdk_pixbuf-2.0 -lglib-2.0 -lgobject-2.0 -lintl
+
+        # Build pangosharpglue-2.dll
+        $CC $CFLAGS $INCLUDES $LDFLAGS -o pango/runtimes/win-x64/native/pangosharpglue-2.dll \
+          pango/glue/attribute.c pango/glue/generated.c pango/glue/units.c pango/glue/win32dll.c \
+          -lpango-1.0 -lglib-2.0 -lgobject-2.0 -lintl
+
+        # Build atksharpglue-2.dll
+        $CC $CFLAGS $INCLUDES $LDFLAGS -o atk/runtimes/win-x64/native/atksharpglue-2.dll \
+          atk/glue/generated.c atk/glue/hyperlink.c atk/glue/misc.c atk/glue/object.c \
+          atk/glue/object_factory.c atk/glue/util.c atk/glue/win32dll.c \
+          -latk-1.0 -lglib-2.0 -lgobject-2.0 -lintl
+
+    - name: Copy Windows GTK+ runtime DLLs
+      run: |
+        MINGW_BIN="${PWD}/mingw-gtk2/mingw64/mingw64/bin"
+
+        # glib dependencies
+        cp "$MINGW_BIN/libglib-2.0-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgobject-2.0-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgio-2.0-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgmodule-2.0-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgthread-2.0-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libintl-8.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libiconv-2.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpcre2-8-0.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libffi-8.dll" glib/runtimes/win-x64/native/
+        cp "$MINGW_BIN/zlib1.dll" glib/runtimes/win-x64/native/
+
+        # cairo dependencies
+        cp "$MINGW_BIN/libcairo-2.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libcairo-gobject-2.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpixman-1-0.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpng16-16.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libfreetype-6.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libfontconfig-1.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libexpat-1.dll" cairo/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libbz2-1.dll" cairo/runtimes/win-x64/native/
+
+        # pango dependencies
+        cp "$MINGW_BIN/libpango-1.0-0.dll" pango/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpangocairo-1.0-0.dll" pango/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpangoft2-1.0-0.dll" pango/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libpangowin32-1.0-0.dll" pango/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libharfbuzz-0.dll" pango/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libfribidi-0.dll" pango/runtimes/win-x64/native/
+
+        # atk, gdk, gtk
+        cp "$MINGW_BIN/libatk-1.0-0.dll" atk/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgdk-win32-2.0-0.dll" gdk/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgdk_pixbuf-2.0-0.dll" gdk/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgtk-win32-2.0-0.dll" gtk/runtimes/win-x64/native/
 
     - name: Create symlinks for custom files
       run: |
