@@ -7,7 +7,7 @@
 //
 
 using System;
-
+using Range = Gtk.Range;
 using Gtk;
 
 namespace WidgetViewer {
