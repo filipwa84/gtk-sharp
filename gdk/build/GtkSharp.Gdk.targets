@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(RuntimeIdentifier)' == 'win-x64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true')">
-    <None Include="$(MSBuildThisFileDirectory)../runtimes/win-x64/native/**/*">
+  <!-- Windows: Copy native DLLs to output -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT' OR '$(RuntimeIdentifier)' == 'win-x64'">
+    <Content Include="$(MSBuildThisFileDirectory)../runtimes/win-x64/native/**/*.dll">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <Visible>false</Visible>
+    </Content>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(RuntimeIdentifier)' == 'linux-x64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true')">
-    <None Include="$(MSBuildThisFileDirectory)../runtimes/linux-x64/native/**/*">
+  <!-- Linux: Copy native .so files to output -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT' AND '$(RuntimeIdentifier)' != 'win-x64'">
+    <Content Include="$(MSBuildThisFileDirectory)../runtimes/linux-x64/native/**/*.so">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <Visible>false</Visible>
+    </Content>
   </ItemGroup>
 </Project>
