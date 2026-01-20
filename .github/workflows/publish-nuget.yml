@@ -28,18 +28,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libgtk2.0-dev libpango1.0-dev libglade2-dev libcairo2-dev
         sudo apt-get install -y mingw-w64 mingw-w64-tools
-        sudo apt-get install -y autoconf automake libtool libtool-bin mono-devel
-
-    - name: Build Linux native glue libraries
-      run: |
-        ./bootstrap-2.12
-        ./configure
-        make -C glib/glue
-        make -C gdk/glue
-        make -C gtk/glue
-        make -C pango/glue
-        make -C atk/glue
-        make -C glade/glue
 
     - name: Create runtimes directories
       run: |
@@ -51,21 +39,64 @@ jobs:
         mkdir -p cairo/runtimes/{win-x64,linux-x64}/native
         mkdir -p glade/runtimes/{win-x64,linux-x64}/native
 
-    - name: Copy Linux native libraries
+    - name: Build Linux native glue libraries
       run: |
-        cp glib/glue/.libs/libglibsharpglue-2.so glib/runtimes/linux-x64/native/
-        cp gdk/glue/.libs/libgdksharpglue-2.so gdk/runtimes/linux-x64/native/
-        cp gtk/glue/.libs/libgtksharpglue-2.so gtk/runtimes/linux-x64/native/
-        cp pango/glue/.libs/libpangosharpglue-2.so pango/runtimes/linux-x64/native/
-        cp atk/glue/.libs/libatksharpglue-2.so atk/runtimes/linux-x64/native/
-        cp glade/glue/.libs/libgladesharpglue-2.so glade/runtimes/linux-x64/native/
+        CFLAGS="-O2 -Wall -shared -fPIC -DGTK_SHARP_2_6 -DGTK_SHARP_2_8 -DGTK_SHARP_2_10 -DGTK_SHARP_2_12 -DDISABLE_GTHREAD_CHECK -Wno-deprecated-declarations"
+        INCLUDES="$(pkg-config --cflags glib-2.0 gtk+-2.0 gdk-2.0 gdk-pixbuf-2.0 pango atk cairo)"
+        GLIB_LIBS="$(pkg-config --libs glib-2.0 gobject-2.0)"
+        GTK_LIBS="$(pkg-config --libs gtk+-2.0 gdk-2.0 gdk-pixbuf-2.0)"
+        PANGO_LIBS="$(pkg-config --libs pango)"
+        ATK_LIBS="$(pkg-config --libs atk)"
 
+        # Build libglibsharpglue-2.so
+        gcc $CFLAGS $INCLUDES -o glib/runtimes/linux-x64/native/libglibsharpglue-2.so \
+          glib/glue/closure.c glib/glue/error.c glib/glue/object.c glib/glue/ptrarray.c \
+          glib/glue/signal.c glib/glue/type.c glib/glue/unichar.c glib/glue/value.c \
+          glib/glue/valuearray.c glib/glue/thread.c \
+          $GLIB_LIBS
+
+        # Build libgdksharpglue-2.so
+        gcc $CFLAGS $INCLUDES -o gdk/runtimes/linux-x64/native/libgdksharpglue-2.so \
+          gdk/glue/device.c gdk/glue/dragcontext.c gdk/glue/event.c gdk/glue/generated.c \
+          gdk/glue/selection.c gdk/glue/windowmanager.c \
+          $GTK_LIBS $GLIB_LIBS
+
+        # Build libgtksharpglue-2.so
+        gcc $CFLAGS $INCLUDES -o gtk/runtimes/linux-x64/native/libgtksharpglue-2.so \
+          gtk/glue/adjustment.c gtk/glue/cellrenderer.c gtk/glue/clipboard.c gtk/glue/colorseldialog.c \
+          gtk/glue/container.c gtk/glue/generated.c gtk/glue/nodestore.c gtk/glue/object.c \
+          gtk/glue/selectiondata.c gtk/glue/statusicon.c gtk/glue/style.c gtk/glue/targetlist.c \
+          gtk/glue/widget.c \
+          $GTK_LIBS $GLIB_LIBS
+
+        # Build libpangosharpglue-2.so
+        gcc $CFLAGS $INCLUDES -o pango/runtimes/linux-x64/native/libpangosharpglue-2.so \
+          pango/glue/attribute.c pango/glue/generated.c pango/glue/units.c \
+          $PANGO_LIBS $GLIB_LIBS
+
+        # Build libatksharpglue-2.so
+        gcc $CFLAGS $INCLUDES -o atk/runtimes/linux-x64/native/libatksharpglue-2.so \
+          atk/glue/generated.c atk/glue/hyperlink.c atk/glue/misc.c atk/glue/object.c \
+          atk/glue/object_factory.c atk/glue/util.c \
+          $ATK_LIBS $GLIB_LIBS
+
+        # Build libgladesharpglue-2.so (if libglade is available)
+        GLADE_LIBS="$(pkg-config --libs libglade-2.0 2>/dev/null)" || true
+        if [ -n "$GLADE_LIBS" ]; then
+          GLADE_INCLUDES="$(pkg-config --cflags libglade-2.0)"
+          gcc $CFLAGS $INCLUDES $GLADE_INCLUDES -o glade/runtimes/linux-x64/native/libgladesharpglue-2.so \
+            glade/glue/gladexml.c glade/glue/generated.c \
+            $GLADE_LIBS $GTK_LIBS $GLIB_LIBS
+        fi
+
+    - name: Copy Linux native libraries to gtk-sharp
+      run: |
         # Copy all glue libs to gtk-sharp for self-contained runtime
-        cp glib/glue/.libs/libglibsharpglue-2.so gtk/runtimes/linux-x64/native/
-        cp gdk/glue/.libs/libgdksharpglue-2.so gtk/runtimes/linux-x64/native/
-        cp pango/glue/.libs/libpangosharpglue-2.so gtk/runtimes/linux-x64/native/
-        cp atk/glue/.libs/libatksharpglue-2.so gtk/runtimes/linux-x64/native/
-        cp glade/glue/.libs/libgladesharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp glib/runtimes/linux-x64/native/libglibsharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp gdk/runtimes/linux-x64/native/libgdksharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp pango/runtimes/linux-x64/native/libpangosharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp atk/runtimes/linux-x64/native/libatksharpglue-2.so gtk/runtimes/linux-x64/native/
+        cp glade/runtimes/linux-x64/native/libgladesharpglue-2.so gtk/runtimes/linux-x64/native/ 2>/dev/null || true
 
     - name: Download Windows GTK+ libraries
       run: |
