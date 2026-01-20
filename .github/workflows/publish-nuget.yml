@@ -122,9 +122,6 @@ jobs:
         wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-libffi-3.4.8-1-any.pkg.tar.zst"
         wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-expat-2.6.4-1-any.pkg.tar.zst"
         wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst"
-        # GCC runtime libraries (required dependencies for all MINGW DLLs)
-        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-gcc-libs-14.2.0-3-any.pkg.tar.zst"
-        wget -q -P packages "${BASE_URL}/mingw-w64-x86_64-libwinpthread-git-12.0.0.r599.gc86a7a5c6-1-any.pkg.tar.zst"
 
     - name: Extract Windows GTK+ libraries
       run: |
@@ -178,10 +175,12 @@ jobs:
       run: |
         MINGW_BIN="${PWD}/mingw-gtk2/mingw64/mingw64/bin"
 
-        # GCC/MINGW runtime libraries (required by all other DLLs)
-        cp "$MINGW_BIN/libgcc_s_seh-1.dll" glib/runtimes/win-x64/native/
-        cp "$MINGW_BIN/libstdc++-6.dll" glib/runtimes/win-x64/native/
-        cp "$MINGW_BIN/libwinpthread-1.dll" glib/runtimes/win-x64/native/
+        # GCC/MINGW runtime libraries from installed cross-compiler
+        # These are required by all MINGW-compiled DLLs
+        GCC_VERSION=$(ls /usr/lib/gcc/x86_64-w64-mingw32/ | head -1)
+        cp "/usr/lib/gcc/x86_64-w64-mingw32/${GCC_VERSION}/libgcc_s_seh-1.dll" glib/runtimes/win-x64/native/
+        cp "/usr/lib/gcc/x86_64-w64-mingw32/${GCC_VERSION}/libstdc++-6.dll" glib/runtimes/win-x64/native/
+        cp "/usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll" glib/runtimes/win-x64/native/
 
         # glib dependencies
         cp "$MINGW_BIN/libglib-2.0-0.dll" glib/runtimes/win-x64/native/
