@@ -32,7 +32,8 @@ jobs:
 
     - name: Build Linux native glue libraries
       run: |
-        ./autogen.sh
+        ./bootstrap-2.12
+        ./configure
         make -C glib/glue
         make -C gdk/glue
         make -C gtk/glue
