@@ -211,8 +211,13 @@ jobs:
         cp "$MINGW_BIN/libgdk_pixbuf-2.0-0.dll" gdk/runtimes/win-x64/native/
         cp "$MINGW_BIN/libgtk-win32-2.0-0.dll" gtk/runtimes/win-x64/native/
 
-        # Copy ALL DLLs to gtk-sharp for self-contained runtime
-        cp "$MINGW_BIN"/*.dll gtk/runtimes/win-x64/native/
+        # Copy required GTK+ runtime DLLs to gtk-sharp
+        cp glib/runtimes/win-x64/native/*.dll gtk/runtimes/win-x64/native/
+        cp cairo/runtimes/win-x64/native/*.dll gtk/runtimes/win-x64/native/
+        cp pango/runtimes/win-x64/native/*.dll gtk/runtimes/win-x64/native/
+        cp atk/runtimes/win-x64/native/*.dll gtk/runtimes/win-x64/native/
+        cp gdk/runtimes/win-x64/native/*.dll gtk/runtimes/win-x64/native/
+        cp "$MINGW_BIN/libgtk-win32-2.0-0.dll" gtk/runtimes/win-x64/native/
 
         # Copy all glue DLLs to gtk-sharp as well
         cp glib/runtimes/win-x64/native/glibsharpglue-2.dll gtk/runtimes/win-x64/native/
