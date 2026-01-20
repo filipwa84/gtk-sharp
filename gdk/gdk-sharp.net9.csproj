@@ -37,6 +37,8 @@
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
     <None Include="gdk-sharp.dll.config" Pack="true" PackagePath="build/net9.0" />
+    <None Include="build/GtkSharp.Gdk.targets" Pack="true" PackagePath="build" />
+    <None Include="build/GtkSharp.Gdk.targets" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 
   <!-- Native libraries for Windows and Linux -->

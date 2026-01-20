@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="build/GtkSharp.Cairo.targets" Pack="true" PackagePath="build" />
+    <None Include="build/GtkSharp.Cairo.targets" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 
   <!-- Native libraries for Windows and Linux -->
