@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Windows: Copy native DLLs to output -->
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' OR '$(RuntimeIdentifier)' == 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/win-x64/native/**/*.dll">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
 
-  <!-- Linux: Copy native .so files to output -->
-  <ItemGroup Condition="'$(OS)' != 'Windows_NT' AND '$(RuntimeIdentifier)' != 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/linux-x64/native/**/*.so">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup>
+    <GtkSharpAtkNativePath>$(MSBuildThisFileDirectory)../runtimes/win-x64/native/</GtkSharpAtkNativePath>
+  </PropertyGroup>
+
+  <Target Name="CopyGtkSharpAtkNativeLibraries" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <AtkNativeDlls Include="$(GtkSharpAtkNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AtkNativeDlls)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyGtkSharpAtkNativeLibrariesOnPublish" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <AtkNativeDlls Include="$(GtkSharpAtkNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AtkNativeDlls)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

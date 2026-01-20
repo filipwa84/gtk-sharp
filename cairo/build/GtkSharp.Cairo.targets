@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Windows: Copy native DLLs to output -->
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' OR '$(RuntimeIdentifier)' == 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/win-x64/native/**/*.dll">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
 
-  <!-- Linux: Copy native .so files to output -->
-  <ItemGroup Condition="'$(OS)' != 'Windows_NT' AND '$(RuntimeIdentifier)' != 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/linux-x64/native/**/*.so">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup>
+    <GtkSharpCairoNativePath>$(MSBuildThisFileDirectory)../runtimes/win-x64/native/</GtkSharpCairoNativePath>
+  </PropertyGroup>
+
+  <Target Name="CopyGtkSharpCairoNativeLibraries" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <CairoNativeDlls Include="$(GtkSharpCairoNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CairoNativeDlls)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyGtkSharpCairoNativeLibrariesOnPublish" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <CairoNativeDlls Include="$(GtkSharpCairoNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CairoNativeDlls)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

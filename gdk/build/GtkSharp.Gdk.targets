@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Windows: Copy native DLLs to output -->
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' OR '$(RuntimeIdentifier)' == 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/win-x64/native/**/*.dll">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
 
-  <!-- Linux: Copy native .so files to output -->
-  <ItemGroup Condition="'$(OS)' != 'Windows_NT' AND '$(RuntimeIdentifier)' != 'win-x64'">
-    <Content Include="$(MSBuildThisFileDirectory)../runtimes/linux-x64/native/**/*.so">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup>
+    <GtkSharpGdkNativePath>$(MSBuildThisFileDirectory)../runtimes/win-x64/native/</GtkSharpGdkNativePath>
+  </PropertyGroup>
+
+  <Target Name="CopyGtkSharpGdkNativeLibraries" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <GdkNativeDlls Include="$(GtkSharpGdkNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GdkNativeDlls)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyGtkSharpGdkNativeLibrariesOnPublish" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup>
+      <GdkNativeDlls Include="$(GtkSharpGdkNativePath)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GdkNativeDlls)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
