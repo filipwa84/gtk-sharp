@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.Cairo</PackageId>
-    <Version>2.12.62</Version>
+    <Version>2.12.63</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
     <Description>Cairo# - .NET bindings for the Cairo 2D graphics library. Part of GTK# for .NET 9.</Description>
