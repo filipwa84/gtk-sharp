@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.Glib</PackageId>
-    <Version>2.12.58</Version>
+    <Version>2.12.59</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
     <Description>GLib# - .NET bindings for the GLib object system library. Part of GTK# for .NET 9.</Description>
