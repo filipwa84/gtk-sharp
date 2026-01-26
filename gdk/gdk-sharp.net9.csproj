@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.Gdk</PackageId>
-    <Version>2.12.57</Version>
+    <Version>2.12.58</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
     <Description>GDK# - .NET bindings for the GDK windowing library. Part of GTK# for .NET 9.</Description>
