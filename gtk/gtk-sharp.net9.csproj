@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.Gtk</PackageId>
-    <Version>2.12.60</Version>
+    <Version>2.12.61</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
     <Description>GTK# - .NET bindings for the GTK+ 2.x widget toolkit. Part of GTK# for .NET 9.</Description>
