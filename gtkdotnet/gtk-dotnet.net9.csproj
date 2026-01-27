@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.GtkDotNet</PackageId>
-    <Version>2.12.63</Version>
+    <Version>2.12.64</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
     <Description>GTK.NET - .NET interop utilities for GTK#. Part of GTK# for .NET 9.</Description>
