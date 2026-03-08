@@ -1,6 +1,6 @@
-# GTK# for .NET 9
+# GTK# for .NET
 
-GTK# is a .NET language binding for the GTK+ 2.x toolkit and assorted GNOME libraries. This fork provides .NET 9 compatible NuGet packages.
+GTK# is a .NET language binding for the GTK+ 2.x toolkit and assorted GNOME libraries. This fork provides .NET 9/10 compatible NuGet packages.
 
 ## Packages
 
@@ -35,7 +35,7 @@ dotnet add package GtkSharp.Gtk --version 2.12.50
 
 ## Requirements
 
-- .NET 9.0 or later
+- .NET 9.0 or .NET 10.0
 - GTK+ 2.x libraries installed on your system
 
 On Debian/Ubuntu:
@@ -49,4 +49,4 @@ GTK# is free software, licensed under the GNU LGPL.
 
 ## Original Project
 
-This is a fork of [mono/gtk-sharp](https://github.com/mono/gtk-sharp) with .NET 9 support.
+This is a fork of [mono/gtk-sharp](https://github.com/mono/gtk-sharp) with .NET 9/10 support.

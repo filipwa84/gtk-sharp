@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <AssemblyName>gtk-dotnet</AssemblyName>
     <RootNamespace>GtkDotNet</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -12,10 +12,10 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>GtkSharp.GtkDotNet</PackageId>
-    <Version>2.12.65</Version>
+    <Version>2.12.66-preview</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
-    <Description>GTK.NET - .NET interop utilities for GTK#. Part of GTK# for .NET 9.</Description>
+    <Description>GTK.NET - .NET interop utilities for GTK#. Part of GTK# for .NET.</Description>
     <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/filipwa84/gtk-sharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/filipwa84/gtk-sharp</RepositoryUrl>
@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../glib/glib-sharp.net9.csproj" />
-    <ProjectReference Include="../gdk/gdk-sharp.net9.csproj" />
+    <ProjectReference Include="../glib/glib-sharp.csproj" />
+    <ProjectReference Include="../gdk/gdk-sharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +40,7 @@
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
     <None Include="gtk-dotnet.dll.config" Pack="true" PackagePath="build/net9.0" />
+    <None Include="gtk-dotnet.dll.config" Pack="true" PackagePath="build/net10.0" />
   </ItemGroup>
 
 </Project>

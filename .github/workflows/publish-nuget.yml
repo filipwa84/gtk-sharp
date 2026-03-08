@@ -7,9 +7,6 @@ on:
     branches: [ net9-packages, main, master ]
   workflow_dispatch:
 
-env:
-  DOTNET_VERSION: '9.0.x'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +18,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: |
+          9.0.x
+          10.0.x
 
     - name: Install build dependencies
       run: |
@@ -245,13 +244,13 @@ jobs:
         done
 
     - name: Restore dependencies
-      run: dotnet restore gtk-sharp.net9.sln
+      run: dotnet restore gtk-sharp.sln
 
     - name: Build
-      run: dotnet build gtk-sharp.net9.sln --configuration Release --no-restore
+      run: dotnet build gtk-sharp.sln --configuration Release --no-restore
 
     - name: Pack NuGet packages
-      run: dotnet pack gtk-sharp.net9.sln --configuration Release --no-build --output ./nupkgs
+      run: dotnet pack gtk-sharp.sln --configuration Release --no-build --output ./nupkgs
 
     - name: Upload NuGet packages as artifacts
       uses: actions/upload-artifact@v4
@@ -277,7 +276,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: 9.0.x
 
     - name: Publish to GitHub Packages
       run: |

@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <AssemblyName>Mono.Cairo</AssemblyName>
-    <RootNamespace>Cairo</RootNamespace>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <AssemblyName>glade-sharp</AssemblyName>
+    <RootNamespace>Glade</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -11,16 +11,16 @@
     <NoWarn>0618;0649;0169;0414;0612;1616;1699;1504</NoWarn>
 
     <!-- NuGet Package Properties -->
-    <PackageId>GtkSharp.Cairo</PackageId>
-    <Version>2.12.65</Version>
+    <PackageId>GtkSharp.Glade</PackageId>
+    <Version>2.12.66-preview</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
-    <Description>Cairo# - .NET bindings for the Cairo 2D graphics library. Part of GTK# for .NET 9.</Description>
+    <Description>Glade# - .NET bindings for the Glade UI designer. Part of GTK# for .NET.</Description>
     <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/filipwa84/gtk-sharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/filipwa84/gtk-sharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>gtk;cairo;dotnet;linux;graphics;2d</PackageTags>
+    <PackageTags>gtk;glade;ui;designer;dotnet;linux</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -29,9 +29,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../glib/glib-sharp.csproj" />
+    <ProjectReference Include="../cairo/cairo-sharp.csproj" />
+    <ProjectReference Include="../pango/pango-sharp.csproj" />
+    <ProjectReference Include="../gdk/gdk-sharp.csproj" />
+    <ProjectReference Include="../atk/atk-sharp.csproj" />
+    <ProjectReference Include="../gtk/gtk-sharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="build/GtkSharp.Cairo.targets" Pack="true" PackagePath="build" />
-    <None Include="build/GtkSharp.Cairo.targets" Pack="true" PackagePath="buildTransitive" />
+    <None Include="glade-sharp.dll.config" Pack="true" PackagePath="build/net9.0" />
+    <None Include="glade-sharp.dll.config" Pack="true" PackagePath="build/net10.0" />
   </ItemGroup>
 
   <!-- Native libraries for Windows and Linux -->

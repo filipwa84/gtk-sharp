@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <AssemblyName>gtk-sharp</AssemblyName>
-    <RootNamespace>Gtk</RootNamespace>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <AssemblyName>glib-sharp</AssemblyName>
+    <RootNamespace>GLib</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -11,16 +11,16 @@
     <NoWarn>0618;0649;0169;0414;0612;1616;1699;1504</NoWarn>
 
     <!-- NuGet Package Properties -->
-    <PackageId>GtkSharp.Gtk</PackageId>
-    <Version>2.12.65</Version>
+    <PackageId>GtkSharp.Glib</PackageId>
+    <Version>2.12.66-preview</Version>
     <Authors>filipwa84</Authors>
     <Company>filipwa84</Company>
-    <Description>GTK# - .NET bindings for the GTK+ 2.x widget toolkit. Part of GTK# for .NET 9.</Description>
+    <Description>GLib# - .NET bindings for the GLib object system library. Part of GTK# for .NET.</Description>
     <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/filipwa84/gtk-sharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/filipwa84/gtk-sharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>gtk;widgets;dotnet;linux;desktop;gui</PackageTags>
+    <PackageTags>gtk;glib;dotnet;linux;desktop;gui</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -29,18 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../glib/glib-sharp.net9.csproj" />
-    <ProjectReference Include="../cairo/cairo-sharp.net9.csproj" />
-    <ProjectReference Include="../pango/pango-sharp.net9.csproj" />
-    <ProjectReference Include="../gdk/gdk-sharp.net9.csproj" />
-    <ProjectReference Include="../atk/atk-sharp.net9.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="gtk-sharp.dll.config" Pack="true" PackagePath="build/net9.0" />
-    <None Include="build/GtkSharp.Gtk.targets" Pack="true" PackagePath="build" />
-    <None Include="build/GtkSharp.Gtk.targets" Pack="true" PackagePath="buildTransitive" />
+    <None Include="glib-sharp.dll.config" Pack="true" PackagePath="build/net9.0" />
+    <None Include="glib-sharp.dll.config" Pack="true" PackagePath="build/net10.0" />
+    <None Include="build/GtkSharp.Glib.targets" Pack="true" PackagePath="build" />
+    <None Include="build/GtkSharp.Glib.targets" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 
   <!-- Native libraries for Windows and Linux -->
